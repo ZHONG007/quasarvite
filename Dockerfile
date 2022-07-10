@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN yarn install
 COPY . .
-RUN yarn build
+RUN yarn quasar build
 
 # production stage
 FROM nginx:stable-alpine as production-stage
