@@ -3,7 +3,7 @@
 FROM node:lts-alpine as develop-stage
 WORKDIR /app
 COPY package*.json ./
-RUN yarn global add @quasar/cli
+RUN yarn global add @quasar/cli && yarn global add @vue/cli
 COPY . .
 # build stage
 FROM develop-stage as build-stage
