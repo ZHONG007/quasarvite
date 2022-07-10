@@ -19,5 +19,7 @@ COPY . .
 # build app for production with minification
 RUN yarn quasar build
 
+RUN rm -rf node_modules/
+
 EXPOSE 8080
-CMD [ "http-server", "spa" ]
+CMD [ "http-server", "dist/spa" ]
