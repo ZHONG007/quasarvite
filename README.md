@@ -13,7 +13,8 @@ npm install
 ```bash
 quasar dev
 ```
-
+###for electron App
+yarn quasar dev -m electron
 
 ### Lint the files
 ```bash

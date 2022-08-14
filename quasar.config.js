@@ -11,10 +11,13 @@
 const { configure } = require('quasar/wrappers')
 const path = require('path')
 
+// this is something to do for future auto import when using vite
+//import AutoImport from 'unplugin-auto-import/vite'
+
 module.exports = configure(function (/* ctx */) {
   return {
     eslint: {
-       fix: true,
+      fix: true,
       // include = [],
       // exclude = [],
       // rawOptions = {},
@@ -58,6 +61,8 @@ module.exports = configure(function (/* ctx */) {
         browser: ['es2021', 'edge97', 'firefox101', 'chrome102', 'safari14.8'],
         node: 'node16'
       },
+
+
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
