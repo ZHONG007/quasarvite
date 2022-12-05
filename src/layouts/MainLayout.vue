@@ -38,6 +38,18 @@
           </q-item>
 
           <q-item
+            to="/generator"
+            active-class="q-item-no-link-highlighting"
+            clickable
+          >
+            <q-item-section avatar>
+              <q-icon name="star" />
+            </q-item-section>
+
+            <q-item-section> generator </q-item-section>
+          </q-item>
+
+          <q-item
             to="/bigdisplay"
             active-class="q-item-no-link-highlighting"
             clickable

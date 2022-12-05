@@ -28,6 +28,10 @@ const routes: RouteRecordRaw[] = [
     path: "/bigdisplay",
     component: () => import("pages/BigDisplay.vue"),
   },
+  {
+    path: "/generator",
+    component: () => import("pages/CodeGenerator.vue"),
+  },
 
 ];
 
