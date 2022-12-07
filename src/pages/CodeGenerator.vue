@@ -2,29 +2,114 @@
   <q-layout>
     <q-page-container>
       <q-page class="">
-        <h5>many to many relationship</h5>
-        <q-btn @click="obtainCode()">change</q-btn>
-        <q-input v-model="mainTable" label="main table" />
-        <q-input v-model="subTable" label="sub table" />
+        <q-card>
+          <div>
+            <h6>many to many relationship</h6>
+            <div>
+              Class/Table Name:<input v-model="mainTable" />
+              <button @click="addItem">Add Column</button>
+              <button @click="generateJava()">Generate code</button>
+              <button @click="apiRequest">Api Request</button>
+              has:<input v-model="subTable" />
+            </div>
 
-        <h5>{{ mainTable }} Code</h5>
-        {{ mainCode }}
+            <div v-for="item in cols" :key="item.columnName" class="row">
+              <input v-model="item.columnName" label="name" class="col-1" />
+              <select v-model="item.typeofCode" class="col-1">
+                <option>Integer</option>
+                <option>String</option>
+                <option>Boolean</option>
+              </select>
+              <input
+                v-model="item.definition"
+                label="definition"
+                class="col-6"
+              />
+            </div>
+          </div>
+          <h6>data Entity</h6>
+          <p v-html="entityCode"></p>
+          <h6>data repository</h6>
+          <p v-html="repositoryCode"></p>
+          <h6>data controller</h6>
+          <p v-html="controllerCode"></p>
+          <h6>ts data class</h6>
+          <p v-html="voTs"></p>
+          <p v-html="resTs"></p>
+
+          <h6>many to many</h6>
+          <div> {{ mainCode }}</div>
+          <h6>sub</h6>
+          {{ subCode }}
+        </q-card>
+
         <!-- <p v-html="mainCode"></p> -->
-        <h5>{{ subTable }} Code</h5>
-        {{ subCode }}
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script lang="ts" setup>
-import { shallowRef } from "vue";
+import { shallowReactive, shallowRef } from "vue";
 import { useQuasar } from "quasar";
+import {
+  generateCol,
+  generateData,
+  generateVoTs,
+} from "src/class/code/generator";
+import { api } from "boot/axios";
 const mainTable = shallowRef("Main");
 const subTable = shallowRef("Sub");
+const entityCode = shallowRef("");
 const mainCode = shallowRef("");
+const controllerCode = shallowRef("");
+const repositoryCode = shallowRef("");
 const subCode = shallowRef("");
+const voTs = shallowRef("");
+const resTs = shallowRef("");
+const cols = shallowReactive([
+  {
+    columnName: "Email",
+    definition: "varchar(127) integer UNIQUE NOT NULL",
+    typeofCode: "String",
+  },
+]);
 //CapTableMain.value = tableMain.value[0].toLocaleUpperCase;
+function addItem() {
+  cols.push({
+    columnName: "User",
+    definition: "varchar(127) integer UNIQUE NOT NULL",
+    typeofCode: "String",
+  });
+}
+
+function apiRequest() {
+  const result = api.get("/todos/1").then((response) => {
+    console.log(response.data, response.status);
+  });
+}
+function generateJava() {
+  // const cols = [
+  //   {
+  //     columnName: "string",
+  //     definition: "string",
+  //     typeofCode: "string",
+  //   },
+  //   {
+  //     columnName: "string1",
+  //     definition: "string1",
+  //     typeofCode: "int",
+  //   },
+  // ];
+  change(mainTable.value, subTable.value);
+  const result = generateData(mainTable.value, cols);
+  const vo = generateVoTs(mainTable.value, cols);
+  entityCode.value = result.dataModel;
+  controllerCode.value = result.controller;
+  voTs.value = vo.vo;
+  resTs.value = vo.res;
+  repositoryCode.value = result.repository;
+}
 
 function toLine(name: string) {
   return name.replace(/([A-Z])/g, "_$1").toLowerCase();
@@ -78,7 +163,7 @@ public void removeTag(long ${subLower}Id) {
   // let str = finalString.replace('<','&lt').replace('>','&gt');
   // console.log(str);
 
-  const subString = `  @ManyToMany(fetch = FetchType.LAZY, cascade = {
+  const subString = `@ManyToMany(fetch = FetchType.LAZY, cascade = {
       CascadeType.PERSIST,
       CascadeType.MERGE
   }, mappedBy = "${subLower}s")
