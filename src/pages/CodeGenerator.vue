@@ -70,11 +70,11 @@
                 <q-card-section>
                   <input type="text" />
                   <input
-                    v-model="_bookVo.author"
+                    v-model="_bookVo.id"
                     label="Author"
                     class="col-1"
                   />
-                  <input v-model="_bookVo.author" label="Id" class="col-1" />
+                  <input v-model="_bookVo.id" label="Id" class="col-1" />
                   <button @click="applyRequest">api request</button>
                 </q-card-section>
               </q-card>
@@ -125,28 +125,11 @@ function addItem() {
 }
 
 async function applyRequest() {
-  const response1 = await fetch(
-    // "https://springservice-ishu2fpggq-uc.a.run.app/v3/api-docs"
-    //  "http://http://127.0.0.1/api/books"
-    "https://jsonplaceholder.typicode.com/todos"
-  );
-  console.log(response1);
-  const response = await fetch(
-    "https://springservice-ishu2fpggq-uc.a.run.app",
-    {
-      method: "GET",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "content/type",
-        // like application/json or text/xml
-      },
-    }
-  );
-  console.log(response);
-  const data = await response.json();
-  console.log(data);
-  return data.code;
-  // _bookVo.apiRequest();
+   const result =await _bookVo.apiRequest('getAll');
+   console.log(result.data.data)
+  // if (result.status = '200'){
+  //  console.log(result.data.data)
+  // }
 }
 
 function apiRequest() {

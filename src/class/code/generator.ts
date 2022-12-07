@@ -148,22 +148,33 @@ export function generateVoTs(tableName: string, col: colStruct[]) {
     public createdAt: string|null = null;<br>
     public updatedAt: string|null = null;<br>
     `;
+    const lowTableName = lowerCase(tableName);
+
   //const _result = generateCol(col);
   const _res = {
     vo:
       stringA +
       result +
       `
-    public apiRequest() {
-      const result = api.get("/api/${tableName}s");<br>
-      const results = api.get("/api/${tableName}s",{params: {id:this.id}});<br>
-      const resultCreate = api.post("/api/${tableName}s",  {data: {
-        firstName: 'Fred',
-        lastName: 'Flintstone'}});<br>
-      const resultUpdate = api.put("/api/${tableName}s/{id}");<br>
-      const resultDelete = api.delete("/api/${tableName}s/{id}");<br>
-      const resultAllDelete = api.delete("/api/${tableName}s/{id}");<br>
-    }};`,
+      public async apiRequest(method: string) {<br>
+        const requestType = ['getAll', 'getById', 'create', 'update', 'deleteById'];
+        switch (method) {
+          case requestType[0]:
+            return await api.get("/${lowTableName}s");<br>
+          case requestType[1]:<br>
+            return await api.get("/${lowTableName}s/" + '{' + this.id?.toString() + '}');<br>
+          case requestType[2]:<br>
+            return await api.post("/${lowTableName}s", this);<br>
+          case requestType[3]:<br>
+            return await api.put("/${lowTableName}s/" + '{' + this.id?.toString() + '}', this);<br>
+          case requestType[4]:<br>
+            return await api.delete("/${lowTableName}s/" + '{' + this.id?.toString() + '}');<br>
+          default:<br>
+            return await api.get("/${lowTableName}s");<br>
+        }<br>
+      }<br>
+
+    };`,
     res: stringB + result + `}`,
   };
   return _res;
