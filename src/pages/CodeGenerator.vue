@@ -2,46 +2,85 @@
   <q-layout>
     <q-page-container>
       <q-page class="">
-        <q-card>
-          <div>
-            <h6>many to many relationship</h6>
-            <div>
-              Class/Table Name:<input v-model="mainTable" />
-              <button @click="addItem">Add Column</button>
-              <button @click="generateJava()">Generate code</button>
-              <button @click="apiRequest">Api Request</button>
-              has:<input v-model="subTable" />
-            </div>
+        <div>
+          <q-list bordered>
+            <q-separator />
 
-            <div v-for="item in cols" :key="item.columnName" class="row">
-              <input v-model="item.columnName" label="name" class="col-1" />
-              <select v-model="item.typeofCode" class="col-1">
-                <option>Integer</option>
-                <option>String</option>
-                <option>Boolean</option>
-              </select>
-              <input
-                v-model="item.definition"
-                label="definition"
-                class="col-6"
-              />
-            </div>
-          </div>
-          <h6>data Entity</h6>
-          <p v-html="entityCode"></p>
-          <h6>data repository</h6>
-          <p v-html="repositoryCode"></p>
-          <h6>data controller</h6>
-          <p v-html="controllerCode"></p>
-          <h6>ts data class</h6>
-          <p v-html="voTs"></p>
-          <p v-html="resTs"></p>
+            <q-expansion-item
+              group="somegroup"
+              icon="perm_identity"
+              label="Second"
+              header-class="text-teal"
+            >
+              <q-card>
+                <div>
+                  <h6>many to many relationship</h6>
+                  <div>
+                    Class/Table Name:<input v-model="mainTable" />
+                    <button @click="addItem">Add Column</button>
+                    <button @click="generateJava()">Generate code</button>
+                    <button @click="apiRequest">Api Request</button>
+                    has:<input v-model="subTable" />
+                  </div>
 
-          <h6>many to many</h6>
-          <div> {{ mainCode }}</div>
-          <h6>sub</h6>
-          {{ subCode }}
-        </q-card>
+                  <div v-for="item in cols" :key="item.columnName" class="row">
+                    <input
+                      v-model="item.columnName"
+                      label="name"
+                      class="col-1"
+                    />
+                    <select v-model="item.typeofCode" class="col-1">
+                      <option>Integer</option>
+                      <option>String</option>
+                      <option>Boolean</option>
+                    </select>
+                    <input
+                      v-model="item.definition"
+                      label="definition"
+                      class="col-6"
+                    />
+                  </div>
+                </div>
+                <h6>data Entity</h6>
+                <p v-html="entityCode"></p>
+                <h6>data repository</h6>
+                <p v-html="repositoryCode"></p>
+                <h6>data controller</h6>
+                <p v-html="controllerCode"></p>
+                <h6>ts data class</h6>
+                <p v-html="voTs"></p>
+                <p v-html="resTs"></p>
+
+                <h6>many to many</h6>
+                <div>{{ mainCode }}</div>
+                <h6>sub</h6>
+                {{ subCode }}
+              </q-card>
+            </q-expansion-item>
+
+            <q-separator />
+            <q-expansion-item
+              group="somegroup"
+              icon="explore"
+              label="First"
+              default-opened
+              header-class="text-primary"
+            >
+              <q-card>
+                <q-card-section>
+                  <input type="text" />
+                  <input
+                    v-model="_bookVo.author"
+                    label="Author"
+                    class="col-1"
+                  />
+                  <input v-model="_bookVo.author" label="Id" class="col-1" />
+                  <button @click="applyRequest">api request</button>
+                </q-card-section>
+              </q-card>
+            </q-expansion-item>
+          </q-list>
+        </div>
 
         <!-- <p v-html="mainCode"></p> -->
       </q-page>
@@ -57,8 +96,10 @@ import {
   generateData,
   generateVoTs,
 } from "src/class/code/generator";
+import { BookVo, Book } from "src/class/VideoInput";
 import { api } from "boot/axios";
 const mainTable = shallowRef("Main");
+const _bookVo = shallowReactive(new BookVo());
 const subTable = shallowRef("Sub");
 const entityCode = shallowRef("");
 const mainCode = shallowRef("");
@@ -81,6 +122,31 @@ function addItem() {
     definition: "varchar(127) integer UNIQUE NOT NULL",
     typeofCode: "String",
   });
+}
+
+async function applyRequest() {
+  const response1 = await fetch(
+    // "https://springservice-ishu2fpggq-uc.a.run.app/v3/api-docs"
+    //  "http://http://127.0.0.1/api/books"
+    "https://jsonplaceholder.typicode.com/todos"
+  );
+  console.log(response1);
+  const response = await fetch(
+    "https://springservice-ishu2fpggq-uc.a.run.app",
+    {
+      method: "GET",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "content/type",
+        // like application/json or text/xml
+      },
+    }
+  );
+  console.log(response);
+  const data = await response.json();
+  console.log(data);
+  return data.code;
+  // _bookVo.apiRequest();
 }
 
 function apiRequest() {

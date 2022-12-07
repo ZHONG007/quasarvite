@@ -118,9 +118,10 @@ export function generateCol(col: colStruct[]) {
   col.forEach((el) => {
     const columnNameLower = lowerCase(el.columnName);
     const _columnName = toLine(columnNameLower);
-    result += `@Column(name = "${_columnName}", columnDefinition = "${el.definition}")`;
-    result += `public ${el.typeofCode} get${el.columnName}() { return ${columnNameLower};}`;
-    result += `public ${el.typeofCode} set${el.columnName}() { this.${columnNameLower}=${columnNameLower} ;} <br>`
+    result += `@Column(name = "${_columnName}", columnDefinition = "${el.definition}")<br>`;
+    result += `private ${el.typeofCode} ${columnNameLower};<br>`;
+    result += `public ${el.typeofCode} get${el.columnName}() { return ${columnNameLower};}<br>`;
+    result += `public void set${el.columnName}(${el.typeofCode} ${columnNameLower}) { this.${columnNameLower}=${columnNameLower} ;} <br>`
   })
   return result;
 }
@@ -190,11 +191,11 @@ export function generateData(tableName: string, col: colStruct[]) {
   const tableNameLower = lowerCase(tableName);
   const _tableName = toLine(tableNameLower);
   const stringA = `import java.io.Serializable;
-  import java.util.Date;
-  import java.util.HashSet;
-  import java.util.Set;
-  import org.hibernate.annotations.CreationTimestamp;
-  import org.hibernate.annotations.UpdateTimestamp;
+  import java.util.Date;<br>
+  import java.util.HashSet;<br>
+  import java.util.Set;<br>
+  import org.hibernate.annotations.CreationTimestamp;<br>
+  import org.hibernate.annotations.UpdateTimestamp;<br>
   import jakarta.persistence.*;//<br>
   @Entity //<br>
   @Table(name = "${_tableName}")
@@ -204,7 +205,7 @@ export function generateData(tableName: string, col: colStruct[]) {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", columnDefinition = "SERIAL")
-    private long id;// ----------
+    private long id;<br>
 
     public long getId() {
         return id;
@@ -217,15 +218,15 @@ export function generateData(tableName: string, col: colStruct[]) {
     @Column(name = "created_at", columnDefinition = "TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP", updatable = false, insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
-    private Date createdAt;// =======
+    private Date createdAt;<br>
 
     public Date getCreatedAt() {
         return createdAt;
-    }
+    }<br>
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
+    }<br>
 
     @Column(name = "updated_at", columnDefinition = "TIMESTAMPTZ DEFAULT NOW()", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
