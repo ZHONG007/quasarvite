@@ -1,4 +1,6 @@
 <template>
+  <!-- write register page -->
+  <!-- page layout for login -->
   <q-layout>
     <q-page-container>
       <q-page class="flex flex-center">
@@ -12,31 +14,34 @@
             $q.platform.is.mobile ? { width: '80%' } : { width: '30%' }
           "
         >
-          <q-img
+          <!-- <q-img
             src="https://www.mpfiltri.com/upload/images/b_MPFILTRI_header%20nuovo%20sito_07_2000x535_aziendatramonto-af6432.jpg"
-          ></q-img>
+          ></q-img> -->
           <q-card-section>
             <div class="row no-wrap items-center">
               <div class="col text-h5 ellipsis">MP Filtri IOT (Beta)</div>
             </div>
           </q-card-section>
           <q-card-section>
-            <q-form class="q-gutter-md">
+            <q-form class="q-gutter-xs">
               <q-input
-                filled
-                v-model="loginVo.email"
+                v-model="loginVo.username"
                 label="Username"
+                filled
+                clearable
                 lazy-rules
+                :rules="[(val) => val.length > 0 || 'not empty']"
               />
               <q-input
-                type="password"
-                filled
                 v-model="loginVo.password"
                 label="Password"
+                filled
+                clearable
                 lazy-rules
+                :rules="[(val) => val.length > 0 || 'not empty']"
               />
 
-              <div>
+              <div class="q-gutter-y-md">
                 <q-btn
                   label="Login"
                   type="button"
@@ -45,10 +50,15 @@
                   style="width: 100%"
                   @click="loginFun"
                 />
-                <q-checkbox
-                  v-model="checkboxState"
-                  label="Do you agree with the terms & conditions?"
-                />
+                <div class="row">
+                  <q-btn class="col-5" flat color="primary" dense
+                    >Create new account?</q-btn
+                  >
+                  <q-space></q-space>
+                  <q-btn class="col-5" flat color="primary" dense
+                    >Forget Password?</q-btn
+                  >
+                </div>
               </div>
             </q-form>
           </q-card-section>
@@ -63,68 +73,16 @@ import { reactive, ref, shallowReactive } from "vue";
 import { useQuasar } from "quasar";
 import { User } from "src/class/user";
 import { useRouter, useRoute } from "vue-router";
-const $q = useQuasar();
-const username = ref("");
-const password = ref("");
-const checkboxState = ref(false);
 const loginVo = shallowReactive(new User());
-const router = useRouter();
-const route = useRoute();
-async function registerFun() {
-  console.log(loginVo);
-  try {
-    const result = await loginVo.register();
-    console.log(result.data.data);
-    //save token
-    if (result?.data.code === 200) {
-      localStorage.setItem("token", result.data.data.token);
-      router.push("/main");
-    }
-  } catch (error) {
-    console.log(error);
-  }
-
-  //afte login change page
-  // router.push();
-  // await Router.a
-}
-
 async function loginFun() {
   try {
-    const result = await loginVo.login();
-    //save token
-    if (result?.data.code === 200) {
-      const token = result.data.data.token;
-      if (token) {
-        localStorage.setItem("token", token);
-        router.push("/main");
-      }
-    }
+    await loginVo.login();
   } catch (error) {
     console.log(error);
-  }
-}
-
-function loginNotify() {
-  if (username.value === "admin" && password.value === "admin") {
-    localStorage.setItem("isLogin", "true");
-    $q.notify({
-      color: "positive",
-      textColor: "white",
-      message: "Login Successful",
-      icon: "done_all",
-    });
-  } else {
-    localStorage.setItem("isLogin", "false");
-    $q.notify({
-      color: "negative",
-      message: "Login failed",
-    });
   }
 }
 </script>
-
-<style lang="scss" scoped>
+<style scoped>
 #particles-js {
   position: absolute;
   width: 100%;

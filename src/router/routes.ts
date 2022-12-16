@@ -16,13 +16,19 @@ const routes: RouteRecordRaw[] = [
 
   // Always leave this as last one,
   // but you can also remove it
+  { path: '/page/:id', component: () => import("pages/video/VideosPage.vue"), },
+  { path: '/video/create', component: () => import("pages/video/CreateVideo.vue"), },
   {
     path: "/:catchAll(.*)*",
     component: () => import("pages/ErrorNotFound.vue"),
   },
   {
     path: "/login",
-    component: () => import("pages/LoginPage.vue"),
+    component: () => import("pages/login/LoginView.vue"),
+  },
+  {
+    path: "/register",
+    component: () => import("pages/login/RegisterView.vue"),
   },
   {
     path: "/bigdisplay",
@@ -30,7 +36,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/generator",
-    component: () => import("pages/CodeGenerator.vue"),
+    component: () => import("pages/GoGenerator.vue"),
   },
 
 ];

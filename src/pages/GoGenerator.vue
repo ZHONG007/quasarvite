@@ -18,7 +18,7 @@
                   <div>
                     Class/Table Name:<input v-model="mainTable" />
                     <button @click="addItem">Add Column</button>
-                    <button @click="generateJava()">Generate code</button>
+                    <button @click="generateJava">Generate code</button>
                     <button @click="apiRequest">Api Request</button>
                     has:<input v-model="subTable" />
                   </div>
@@ -30,27 +30,22 @@
                     <div class="col-1">Unique</div>
                   </div>
 
-                  <div v-for="item in cols" :key="item.columnName" class="row">
-                    <input
-                      v-model="item.columnName"
-                      label="name"
-                      class="col-1"
-                    />
-                    <select v-model="item.typeofCode" class="col-1">
+                  <div v-for="(item, index) in cols" :key="index" class="row">
+                    <input v-model="item.name" label="name" class="col-1" />
+                    <select v-model="item.typeofData" class="col-1">
                       <option>Integer</option>
                       <option>String</option>
                       <option>Boolean</option>
                     </select>
-                    <input
-                      v-model="item.columnName"
-                      label="size"
-                      class="col-1"
-                    />
-                    <input
-                      v-model="item.columnName"
-                      label="name"
-                      class="col-1"
-                    />
+                    <input v-model="item.sizeofString" class="col-1" />
+                    <select v-model="item.nullable" class="col-1">
+                      <option>true</option>
+                      <option>false</option>
+                    </select>
+                    <select v-model="item.unique" class="col-1">
+                      <option>true</option>
+                      <option>false</option>
+                    </select>
                     <input
                       v-model="item.definition"
                       label="definition"
@@ -58,20 +53,11 @@
                     />
                   </div>
                 </div>
+                <p v-html="goCode"></p>
+                <p v-html="goController"></p>
+                {{ goCode }}
                 <h6>data Entity</h6>
-                <p v-html="entityCode"></p>
-                <h6>data repository</h6>
-                <p v-html="repositoryCode"></p>
-                <h6>data controller</h6>
-                <p v-html="controllerCode"></p>
-                <h6>ts data class</h6>
-                <p v-html="voTs"></p>
-                <p v-html="resTs"></p>
-
-                <h6>many to many</h6>
-                <div>{{ mainCode }}</div>
-                <h6>sub</h6>
-                {{ subCode }}
+                <p v-html="mainCode"></p>
               </q-card>
             </q-expansion-item>
 
@@ -86,11 +72,7 @@
               <q-card>
                 <q-card-section>
                   <input type="text" />
-                  <input
-                    v-model="_bookVo.id"
-                    label="Author"
-                    class="col-1"
-                  />
+                  <input v-model="_bookVo.id" label="Author" class="col-1" />
                   <input v-model="_bookVo.id" label="Id" class="col-1" />
                   <button @click="applyRequest">api request</button>
                 </q-card-section>
@@ -106,16 +88,32 @@
 </template>
 
 <script lang="ts" setup>
-import { shallowReactive, shallowRef } from "vue";
-import { useQuasar } from "quasar";
+import { reactive, shallowReactive, shallowRef } from "vue";
 import {
-  generateCol,
-  generateData,
-  generateVoTs,
-} from "src/class/code/generator";
+  QCard,
+  QCardSection,
+  QExpansionItem,
+  QLayout,
+  QList,
+  QPage,
+  QPageContainer,
+  QSeparator,
+  useQuasar,
+} from "quasar";
+import {
+  generateColGo,
+  colStructe,
+  generateController,
+  generateColJava,
+generateJavaData,
+generateVoTs,
+} from "src/class/code/golang";
 import { BookVo, Book } from "src/class/VideoInput";
 import { api } from "boot/axios";
+import { generateData } from "src/class/code/generator";
 const mainTable = shallowRef("Main");
+const goCode = shallowRef("Main");
+const goController = shallowRef("");
 const _bookVo = shallowReactive(new BookVo());
 const subTable = shallowRef("Sub");
 const entityCode = shallowRef("");
@@ -125,25 +123,31 @@ const repositoryCode = shallowRef("");
 const subCode = shallowRef("");
 const voTs = shallowRef("");
 const resTs = shallowRef("");
-const cols = shallowReactive([
+const cols: colStructe[] = shallowReactive([
   {
-    columnName: "Email",
-    definition: "varchar(127) integer UNIQUE NOT NULL",
-    typeofCode: "String",
+    name: "Email",
+    definition: "",
+    typeofData: "String",
+    sizeofString: 127,
+    nullable: "true",
+    unique: "false",
   },
 ]);
 //CapTableMain.value = tableMain.value[0].toLocaleUpperCase;
 function addItem() {
   cols.push({
-    columnName: "User",
-    definition: "varchar(127) integer UNIQUE NOT NULL",
-    typeofCode: "String",
+    name: "User",
+    definition: "",
+    typeofData: "String",
+    sizeofString: 127,
+    nullable: "true",
+    unique: "false",
   });
 }
 
 async function applyRequest() {
-   const result =await _bookVo.apiRequest('getAll');
-   console.log(result.data.data)
+  const result = await _bookVo.apiRequest("getAll");
+  console.log(result.data.data);
   // if (result.status = '200'){
   //  console.log(result.data.data)
   // }
@@ -155,26 +159,14 @@ function apiRequest() {
   });
 }
 function generateJava() {
-  // const cols = [
-  //   {
-  //     columnName: "string",
-  //     definition: "string",
-  //     typeofCode: "string",
-  //   },
-  //   {
-  //     columnName: "string1",
-  //     definition: "string1",
-  //     typeofCode: "int",
-  //   },
-  // ];
-  change(mainTable.value, subTable.value);
-  const result = generateData(mainTable.value, cols);
-  const vo = generateVoTs(mainTable.value, cols);
-  entityCode.value = result.dataModel;
-  controllerCode.value = result.controller;
-  voTs.value = vo.vo;
-  resTs.value = vo.res;
-  repositoryCode.value = result.repository;
+  console.log("hehe");
+  goCode.value = generateColGo(mainTable.value, cols);
+  goController.value = generateController(mainTable.value);
+  generateColJava(cols);
+  const code = generateJavaData(mainTable.value,cols);
+  const code2 = code.controller+code.dataModel+code.repository;
+  const vcode = generateVoTs(mainTable.value, cols);
+  mainCode.value = vcode+code2+code2;
 }
 
 function toLine(name: string) {
